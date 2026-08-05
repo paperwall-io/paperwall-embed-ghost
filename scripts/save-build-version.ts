@@ -110,6 +110,10 @@ export const saveBuildVersion = async () => {
     method: "POST",
     verbose: true,
     body: {
+      // Required. The API defaults embedType to "standard", and publishing
+      // under that type deactivates the standard build for every publisher —
+      // one active version per type.
+      embedType: "ghost",
       version: version,
       jsSri: jsFile.hash,
       cssSri: cssFile.hash,
