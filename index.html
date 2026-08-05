@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Post Title</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Source+Sans+3:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+      *, *::before, *::after {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        padding: 0;
+        background-color: #fafafa;
+        color: #1a1a1a;
+        font-family: 'Libre Baskerville', Georgia, serif;
+        font-size: 18px;
+        line-height: 1.8;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+
+      main {
+        max-width: 680px;
+        margin: 0 auto;
+        padding: 60px 24px 100px;
+      }
+
+      article header {
+        margin-bottom: 48px;
+        padding-bottom: 32px;
+        border-bottom: 1px solid #e0e0e0;
+      }
+
+      article header h1 {
+        font-family: 'Source Sans 3', -apple-system, BlinkMacSystemFont, sans-serif;
+        font-size: 42px;
+        font-weight: 600;
+        line-height: 1.2;
+        margin: 0 0 16px;
+        color: #111;
+        letter-spacing: -0.5px;
+      }
+
+      article header p {
+        font-family: 'Source Sans 3', -apple-system, BlinkMacSystemFont, sans-serif;
+        font-size: 15px;
+        color: #666;
+        margin: 4px 0;
+        line-height: 1.4;
+      }
+
+      article > p {
+        margin: 0 0 24px;
+        text-align: justify;
+        hyphens: auto;
+      }
+
+      article > p:first-of-type::first-letter {
+        font-size: 3.5em;
+        float: left;
+        line-height: 1;
+        margin: 0 12px 0 0;
+        font-weight: 700;
+        color: #333;
+      }
+
+      a {
+        color: #1a5f7a;
+        text-decoration: none;
+        border-bottom: 1px solid transparent;
+        transition: border-color 0.2s ease;
+      }
+
+      a:hover {
+        border-bottom-color: #1a5f7a;
+      }
+
+      /* Site Header */
+      .site-header {
+        background: #fff;
+        border-bottom: 1px solid #e0e0e0;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+      }
+
+      .site-header-inner {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 16px 24px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .site-logo {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        text-decoration: none;
+        border: none;
+      }
+
+      .site-logo img {
+        width: 48px;
+        height: 48px;
+        border-radius: 8px;
+        object-fit: cover;
+      }
+
+      .site-logo-text {
+        font-family: 'Source Sans 3', -apple-system, BlinkMacSystemFont, sans-serif;
+        font-size: 24px;
+        font-weight: 600;
+        color: #111;
+        letter-spacing: -0.5px;
+      }
+
+      .site-nav {
+        display: flex;
+        gap: 32px;
+      }
+
+      .site-nav a {
+        font-family: 'Source Sans 3', -apple-system, BlinkMacSystemFont, sans-serif;
+        font-size: 15px;
+        color: #444;
+        text-decoration: none;
+        border: none;
+        transition: color 0.2s ease;
+      }
+
+      .site-nav a:hover {
+        color: #1a5f7a;
+      }
+
+      /* Site Footer */
+      .site-footer {
+        background: #1a1a1a;
+        color: #ccc;
+        padding: 60px 24px;
+        margin-top: 80px;
+      }
+
+      .site-footer-inner {
+        max-width: 1100px;
+        margin: 0 auto;
+      }
+
+      .footer-top {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 48px;
+        padding-bottom: 48px;
+        border-bottom: 1px solid #333;
+      }
+
+      .footer-section h3 {
+        font-family: 'Source Sans 3', -apple-system, BlinkMacSystemFont, sans-serif;
+        font-size: 14px;
+        font-weight: 600;
+        color: #fff;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin: 0 0 20px;
+      }
+
+      .footer-section p {
+        font-size: 15px;
+        line-height: 1.6;
+        margin: 0 0 16px;
+      }
+
+      .footer-section a {
+        color: #aaa;
+        border-bottom-color: transparent;
+      }
+
+      .footer-section a:hover {
+        color: #fff;
+        border-bottom-color: #fff;
+      }
+
+      .footer-links {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+
+      .footer-links li {
+        margin-bottom: 12px;
+      }
+
+      .footer-links a {
+        font-size: 15px;
+        color: #aaa;
+      }
+
+      .footer-gallery {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+      }
+
+      .footer-gallery img {
+        width: 100%;
+        aspect-ratio: 1;
+        object-fit: cover;
+        border-radius: 4px;
+        opacity: 0.8;
+        transition: opacity 0.2s ease;
+      }
+
+      .footer-gallery img:hover {
+        opacity: 1;
+      }
+
+      .footer-bottom {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-top: 32px;
+      }
+
+      .footer-bottom p {
+        font-size: 14px;
+        margin: 0;
+        color: #666;
+      }
+
+      .footer-social {
+        display: flex;
+        gap: 16px;
+      }
+
+      .footer-social a {
+        color: #666;
+        font-size: 14px;
+      }
+
+      .footer-social a:hover {
+        color: #fff;
+      }
+
+      @media (max-width: 768px) {
+        .footer-top {
+          grid-template-columns: 1fr;
+          gap: 32px;
+        }
+
+        .footer-bottom {
+          flex-direction: column;
+          gap: 16px;
+          text-align: center;
+        }
+
+        .site-nav {
+          display: none;
+        }
+      }
+
+      @media (max-width: 600px) {
+        body {
+          font-size: 16px;
+        }
+
+        main {
+          padding: 40px 20px 80px;
+        }
+
+        article header h1 {
+          font-size: 32px;
+        }
+
+        article > p:first-of-type::first-letter {
+          font-size: 3em;
+        }
+
+        .site-logo-text {
+          font-size: 20px;
+        }
+
+        .site-logo img {
+          width: 40px;
+          height: 40px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="site-header-inner">
+        <a href="/" class="site-logo">
+          <img src="https://picsum.photos/seed/logo/96/96" alt="The Daily Chronicle">
+          <span class="site-logo-text">The Daily Chronicle</span>
+        </a>
+        <nav class="site-nav">
+          <a href="/politics">Politics</a>
+          <a href="/technology">Technology</a>
+          <a href="/culture">Culture</a>
+          <a href="/opinion">Opinion</a>
+          <a href="/subscribe">Subscribe</a>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <article id="blog-post">
+        <header>
+          <h1>Post Title</h1>
+          <p>Posted on 2021-01-01</p>
+          <p>By John Doe</p>
+        </header>
+        <p>
+          Goto: <a href="/posts/7-docs-that-scale">Docs that scale</a>,
+          <a href="/posts/3-structuring-your-code">structuring your code</a>,
+          <a href="/posts/dead-post-society">dead post</a>
+        </p>
+        <p>
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod,
+          nisl id aliquet ultrices, nunc nisl tincidunt nunc, nec lacinia nisl
+          nunc id nunc. Sed euismod, nisl id aliquet ultrices, nunc nisl
+          tincidunt nunc, nec lacinia nisl nunc id nunc.
+        </p>
+        <p>
+          Nullam euismod, nisl id aliquet ultrices, nunc nisl tincidunt nunc,
+          nec lacinia nisl nunc id nunc. Sed euismod, nisl id aliquet ultrices,
+          nunc nisl tincidunt nunc, nec lacinia nisl nunc id nunc. Nullam
+          euismod, nisl id aliquet ultrices, nunc nisl tincidunt nunc, nec
+          lacinia nisl nunc id nunc.
+        </p>
+        <p>
+          Etiam euismod, nisl id aliquet ultrices, nunc nisl tincidunt nunc, nec
+          lacinia nisl nunc id nunc. Sed euismod, nisl id aliquet ultrices, nunc
+          nisl tincidunt nunc, nec lacinia nisl nunc id nunc. Etiam euismod,
+          nisl id aliquet ultrices, nunc nisl tincidunt nunc, nec lacinia nisl
+          nunc id nunc.
+        </p>
+        <p>
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod,
+          nisl id aliquet ultrices, nunc nisl tincidunt nunc, nec lacinia nisl
+          nunc id nunc. Sed euismod, nisl id aliquet ultrices, nunc nisl
+          tincidunt nunc, nec lacinia nisl nunc id nunc.
+        </p>
+        <p>
+          Nullam euismod, nisl id aliquet ultrices, nunc nisl tincidunt nunc,
+          nec lacinia nisl nunc id nunc. Sed euismod, nisl id aliquet ultrices,
+          nunc nisl tincidunt nunc, nec lacinia nisl nunc id nunc. Nullam
+          euismod, nisl id aliquet ultrices, nunc nisl tincidunt nunc, nec
+          lacinia nisl nunc id nunc.
+        </p>
+        <p>
+          Etiam euismod, nisl id aliquet ultrices, nunc nisl tincidunt nunc, nec
+          lacinia nisl nunc id nunc. Sed euismod, nisl id aliquet ultrices, nunc
+          nisl tincidunt nunc, nec lacinia nisl nunc id nunc. Etiam euismod,
+          nisl id aliquet ultrices, nunc nisl tincidunt nunc, nec lacinia nisl
+          nunc id nunc.
+        </p>
+        <p>
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod,
+          nisl id aliquet ultrices, nunc nisl tincidunt nunc, nec lacinia nisl
+          nunc id nunc. Sed euismod, nisl id aliquet ultrices, nunc nisl
+          tincidunt nunc, nec lacinia nisl nunc id nunc.
+        </p>
+        <p>
+          Nullam euismod, nisl id aliquet ultrices, nunc nisl tincidunt nunc,
+          nec lacinia nisl nunc id nunc. Sed euismod, nisl id aliquet ultrices,
+          nunc nisl tincidunt nunc, nec lacinia nisl nunc id nunc. Nullam
+          euismod, nisl id aliquet ultrices, nunc nisl tincidunt nunc, nec
+          lacinia nisl nunc id nunc.
+        </p>
+        <p>
+          Etiam euismod, nisl id aliquet ultrices, nunc nisl tincidunt nunc, nec
+          lacinia nisl nunc id nunc. Sed euismod, nisl id aliquet ultrices, nunc
+          nisl tincidunt nunc, nec lacinia nisl nunc id nunc. Etiam euismod,
+          nisl id aliquet ultrices, nunc nisl tincidunt nunc, nec lacinia nisl
+          nunc id nunc.
+        </p>
+        <p>
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod,
+          nisl id aliquet ultrices, nunc nisl tincidunt nunc, nec lacinia nisl
+          nunc id nunc. Sed euismod, nisl id aliquet ultrices, nunc nisl
+          tincidunt nunc, nec lacinia nisl nunc id nunc.
+        </p>
+        <p>
+          Nullam euismod, nisl id aliquet ultrices, nunc nisl tincidunt nunc,
+          nec lacinia nisl nunc id nunc. Sed euismod, nisl id aliquet ultrices,
+          nunc nisl tincidunt nunc, nec lacinia nisl nunc id nunc. Nullam
+          euismod, nisl id aliquet ultrices, nunc nisl tincidunt nunc, nec
+          lacinia nisl nunc id nunc.
+        </p>
+        <p>
+          Etiam euismod, nisl id aliquet ultrices, nunc nisl tincidunt nunc, nec
+          lacinia nisl nunc id nunc. Sed euismod, nisl id aliquet ultrices, nunc
+          nisl tincidunt nunc, nec lacinia nisl nunc id nunc. Etiam euismod,
+          nisl id aliquet ultrices, nunc nisl tincidunt nunc, nec lacinia nisl
+          nunc id nunc.
+        </p>
+        <p>
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod,
+          nisl id aliquet ultrices, nunc nisl tincidunt nunc, nec lacinia nisl
+          nunc id nunc. Sed euismod, nisl id aliquet ultrices, nunc nisl
+          tincidunt nunc, nec lacinia nisl nunc id nunc.
+        </p>
+        <p>
+          Nullam euismod, nisl id aliquet ultrices, nunc nisl tincidunt nunc,
+          nec lacinia nisl nunc id nunc. Sed euismod, nisl id aliquet ultrices,
+          nunc nisl tincidunt nunc, nec lacinia nisl nunc id nunc. Nullam
+          euismod, nisl id aliquet ultrices, nunc nisl tincidunt nunc, nec
+          lacinia nisl nunc id nunc.
+        </p>
+        <p>
+          Etiam euismod, nisl id aliquet ultrices, nunc nisl tincidunt nunc, nec
+          lacinia nisl nunc id nunc. Sed euismod, nisl id aliquet ultrices, nunc
+          nisl tincidunt nunc, nec lacinia nisl nunc id nunc. Etiam euismod,
+          nisl id aliquet ultrices, nunc nisl tincidunt nunc, nec lacinia nisl
+          nunc id nunc.
+        </p>
+        <p>
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod,
+          nisl id aliquet ultrices, nunc nisl tincidunt nunc, nec lacinia nisl
+          nunc id nunc. Sed euismod, nisl id aliquet ultrices, nunc nisl
+          tincidunt nunc, nec lacinia nisl nunc id nunc.
+        </p>
+        <p>
+          Nullam euismod, nisl id aliquet ultrices, nunc nisl tincidunt nunc,
+          nec lacinia nisl nunc id nunc. Sed euismod, nisl id aliquet ultrices,
+          nunc nisl tincidunt nunc, nec lacinia nisl nunc id nunc. Nullam
+          euismod, nisl id aliquet ultrices, nunc nisl tincidunt nunc, nec
+          lacinia nisl nunc id nunc.
+        </p>
+        <p>
+          Etiam euismod, nisl id aliquet ultrices, nunc nisl tincidunt nunc, nec
+          lacinia nisl nunc id nunc. Sed euismod, nisl id aliquet ultrices, nunc
+          nisl tincidunt nunc, nec lacinia nisl nunc id nunc. Etiam euismod,
+          nisl id aliquet ultrices, nunc nisl tincidunt nunc, nec lacinia nisl
+          nunc id nunc.
+        </p>
+        <p>
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod,
+          nisl id aliquet ultrices, nunc nisl tincidunt nunc, nec lacinia nisl
+          nunc id nunc. Sed euismod, nisl id aliquet ultrices, nunc nisl
+          tincidunt nunc, nec lacinia nisl nunc id nunc.
+        </p>
+        <p>
+          Nullam euismod, nisl id aliquet ultrices, nunc nisl tincidunt nunc,
+          nec lacinia nisl nunc id nunc. Sed euismod, nisl id aliquet ultrices,
+          nunc nisl tincidunt nunc, nec lacinia nisl nunc id nunc. Nullam
+          euismod, nisl id aliquet ultrices, nunc nisl tincidunt nunc, nec
+          lacinia nisl nunc id nunc.
+        </p>
+        <p>
+          Etiam euismod, nisl id aliquet ultrices, nunc nisl tincidunt nunc, nec
+          lacinia nisl nunc id nunc. Sed euismod, nisl id aliquet ultrices, nunc
+          nisl tincidunt nunc, nec lacinia nisl nunc id nunc. Etiam euismod,
+          nisl id aliquet ultrices, nunc nisl tincidunt nunc, nec lacinia nisl
+          nunc id nunc.
+        </p>
+        <p>
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod,
+          nisl id aliquet ultrices, nunc nisl tincidunt nunc, nec lacinia nisl
+          nunc id nunc. Sed euismod, nisl id aliquet ultrices, nunc nisl
+          tincidunt nunc, nec lacinia nisl nunc id nunc.
+        </p>
+        <p>
+          Nullam euismod, nisl id aliquet ultrices, nunc nisl tincidunt nunc,
+          nec lacinia nisl nunc id nunc. Sed euismod, nisl id aliquet ultrices,
+          nunc nisl tincidunt nunc, nec lacinia nisl nunc id nunc. Nullam
+          euismod, nisl id aliquet ultrices, nunc nisl tincidunt nunc, nec
+          lacinia nisl nunc id nunc.
+        </p>
+        <p>
+          Etiam euismod, nisl id aliquet ultrices, nunc nisl tincidunt nunc, nec
+          lacinia nisl nunc id nunc. Sed euismod, nisl id aliquet ultrices, nunc
+          nisl tincidunt nunc, nec lacinia nisl nunc id nunc. Etiam euismod,
+          nisl id aliquet ultrices, nunc nisl tincidunt nunc, nec lacinia nisl
+          nunc id nunc.
+        </p>
+        <p>
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod,
+          nisl id aliquet ultrices, nunc nisl tincidunt nunc, nec lacinia nisl
+          nunc id nunc. Sed euismod, nisl id aliquet ultrices, nunc nisl
+          tincidunt nunc, nec lacinia nisl nunc id nunc.
+        </p>
+        <p>
+          Nullam euismod, nisl id aliquet ultrices, nunc nisl tincidunt nunc,
+          nec lacinia nisl nunc id nunc. Sed euismod, nisl id aliquet ultrices,
+          nunc nisl tincidunt nunc, nec lacinia nisl nunc id nunc. Nullam
+          euismod, nisl id aliquet ultrices, nunc nisl tincidunt nunc, nec
+          lacinia nisl nunc id nunc.
+        </p>
+        <p>
+          Etiam euismod, nisl id aliquet ultrices, nunc nisl tincidunt nunc, nec
+          lacinia nisl nunc id nunc. Sed euismod, nisl id aliquet ultrices, nunc
+          nisl tincidunt nunc, nec lacinia nisl nunc id nunc. Etiam euismod,
+          nisl id aliquet ultrices, nunc nisl tincidunt nunc, nec lacinia nisl
+          nunc id nunc.
+        </p>
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <div class="site-footer-inner">
+        <div class="footer-top">
+          <div class="footer-section">
+            <h3>About Us</h3>
+            <p>The Daily Chronicle has been delivering quality journalism since 1892. We believe in the power of informed citizens and the importance of a free press.</p>
+            <p><a href="/about">Learn more about our mission</a></p>
+          </div>
+          <div class="footer-section">
+            <h3>Explore</h3>
+            <ul class="footer-links">
+              <li><a href="/politics">Politics</a></li>
+              <li><a href="/technology">Technology</a></li>
+              <li><a href="/culture">Culture</a></li>
+              <li><a href="/opinion">Opinion</a></li>
+              <li><a href="/podcasts">Podcasts</a></li>
+              <li><a href="/newsletters">Newsletters</a></li>
+            </ul>
+          </div>
+          <div class="footer-section">
+            <h3>From Our Gallery</h3>
+            <div class="footer-gallery">
+              <img src="https://picsum.photos/seed/gallery1/200/200" alt="Gallery image 1">
+              <img src="https://picsum.photos/seed/gallery2/200/200" alt="Gallery image 2">
+              <img src="https://picsum.photos/seed/gallery3/200/200" alt="Gallery image 3">
+              <img src="https://picsum.photos/seed/gallery4/200/200" alt="Gallery image 4">
+              <img src="https://picsum.photos/seed/gallery5/200/200" alt="Gallery image 5">
+              <img src="https://picsum.photos/seed/gallery6/200/200" alt="Gallery image 6">
+            </div>
+          </div>
+        </div>
+        <div class="footer-bottom">
+          <p>&copy; 2025 The Daily Chronicle. All rights reserved.</p>
+          <div class="footer-social">
+            <a href="#">Twitter</a>
+            <a href="#">Facebook</a>
+            <a href="#">Instagram</a>
+            <a href="#">RSS</a>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <script type="module" src="/src/lib/main.ts"></script>
+  </body>
+</html>

@@ -1,0 +1,31 @@
+# See https://fly.io/docs/app-guides/continuous-deployment-with-github-actions/
+
+name: Uploading assets
+on:
+  create:
+    tags:
+      - v*
+
+jobs:
+  deploy:
+    name: Upload assets to storage - ${{ github.ref_name }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.3.13
+      - name: Install 1Password CLI
+        uses: 1password/install-cli-action@v1
+      - name: Upload production embed version
+        run: bun i --trust && bun run build
+        env:
+          APP_ENV: production
+          OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+          EMBED_VERSION: ${{ github.ref_name }}
+      - name: Upload staging embed version
+        run: bun i --trust && bun run build
+        env:
+          APP_ENV: staging
+          OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+          EMBED_VERSION: ${{ github.ref_name }}

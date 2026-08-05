@@ -1,0 +1,99 @@
+#pw-blog-post {
+  max-width: 700px;
+  margin: 0 auto;
+  font-size: 1.1rem;
+  line-height: 1.5;
+}
+
+#paperwall {
+  font-family: Verdana, sans-serif;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+#paperwall .pw-card {
+  padding: 8px 24px;
+  font-weight: 500;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.8);
+  background-color: #fefefe;
+  color: #333;
+  overflow: hidden;
+}
+
+#paperwall .pw-card.--animate {
+  /* Initial state */
+  max-height: 0;
+  opacity: 0;
+}
+
+#paperwall .pw-card.--is-visible {
+  max-height: 200px;
+  opacity: 1;
+  animation: grow 0.25s ease-in-out both;
+}
+
+#paperwall a.pw-link {
+  color: #333;
+  font-weight: 600;
+}
+
+@keyframes grow {
+  from {
+    transform: translateY(0);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(auto);
+    opacity: 1;
+  }
+}
+
+@keyframes shrink {
+  from {
+    transform: translateY(200px);
+    opacity: 1;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 0;
+  }
+}
+
+#paperwall .pw-btn {
+  box-shadow: 0px 0px 2px 2px rgba(0, 0, 0, 0.1);
+  background-color: #182318;
+  margin: 0px 0 8px;
+  color: #fff;
+  text-decoration: none;
+  border: transparent;
+  cursor: pointer;
+  display: block;
+  padding: 8px 16px;
+  line-height: 1;
+}
+
+.pw-btn.sm {
+  border-radius: 4px;
+  padding: 0px 4px;
+  font-size: 0.8rem;
+}
+
+.pw-btn.lg {
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: 1.3rem;
+}
+
+#paperwall .pw-star-icon {
+    font-size: 1.2rem;
+    padding: 0 3px;
+}
+#paperwall .pw-star-icon:before {
+      content: "★";
+}
+#paperwall .pw-star-icon.pw-fill {
+      color: #ce870a;
+}
