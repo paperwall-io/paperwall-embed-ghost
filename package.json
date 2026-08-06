@@ -1,5 +1,5 @@
 {
-  "name": "paperwall-embed",
+  "name": "paperwall-embed-ghost",
   "version": "0.0.0",
   "devDependencies": {
     "@rollup/plugin-alias": "^5.1.0",
