@@ -2,7 +2,9 @@
   import pw from "@lib/main";
   import wallStore from "@lib/stores";
   import PostWall from "./show-wall/ShowWall.svelte";
+  import GhostCta from "./show-wall/GhostCta.svelte";
   import BeyondWall from "./show-article/ArticleInfoToggle.svelte";
+  import { findGhostCtaAnchor } from "./ghostCta";
   import {
     fetchArticleContent,
     injectContent,
@@ -12,7 +14,22 @@
   } from "./ghostContent";
 
   const articleDOM = pw.articleFinder.getEl() as unknown as HTMLElement;
-  console.log('pw config', pw.config)
+
+  /**
+   * Resolved once, before anything renders.
+   *
+   * When Ghost's upgrade CTA is on the page we render inside it. When it is not
+   * — a custom theme overriding Ghost's partial, or a post gated some other way
+   * — we fall back to the standalone wall. Rendering nothing would be invisible
+   * to the publisher and would quietly cost them every sale on that page.
+   */
+  const ghostCtaAnchor = findGhostCtaAnchor();
+
+  if (!ghostCtaAnchor) {
+    console.warn(
+      "[paperwall] no Ghost upgrade CTA found on this page (.gh-post-upgrade-cta-content > a.gh-btn); falling back to the standalone wall",
+    );
+  }
 
   let unlock = $state<UnlockState>({ status: "idle" });
 
@@ -50,7 +67,19 @@
     }
   });
 
+  /**
+   * Clamping the article and locking body scroll only makes sense under the
+   * standalone wall, which is a fixed panel covering the bottom of the
+   * viewport.
+   *
+   * In CTA mode neither applies: Ghost already truncated the post server-side,
+   * and our CTA is ordinary inline content. Locking body scroll there would
+   * trap a reader part-way through the free portion — hostile, and for no
+   * benefit, since there is nothing to scroll past.
+   */
   $effect(() => {
+    if (ghostCtaAnchor) return;
+
     if ($wallStore.wallState === "@paperwall/show_wall") {
       articleDOM.style.height = "55vh";
       articleDOM.style.overflow = "hidden";
@@ -79,8 +108,11 @@
 
 {#if $wallStore.wallState !== "@paperwall/no_wall" && $wallStore.entities.article}
   {#if $wallStore.wallState === "@paperwall/show_wall"}
-    <!-- <dialog class="backdrop" open></dialog> -->
-    <PostWall />
+    {#if ghostCtaAnchor}
+      <GhostCta anchor={ghostCtaAnchor} />
+    {:else}
+      <PostWall />
+    {/if}
   {:else if $wallStore.wallState === "@paperwall/show_article"}
     <BeyondWall />
   {/if}

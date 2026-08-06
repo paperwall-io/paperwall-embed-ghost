@@ -254,7 +254,7 @@
 
     "node-addon-api": ["node-addon-api@7.1.1", "", {}, "sha512-5m3bsyrjFWE1xf7nz7YXdN4udnVtXK6/Yfgn5qnahL6bCkf2yKt4k3nuTKAtT4r3IG8JNR2ncsIMdZuAzJjHQQ=="],
 
-    "paperwall": ["paperwall@github:paperwall-io/paperwall-lib#4f65487", { "dependencies": { "varlock": "^1.2.0" }, "peerDependencies": { "typescript": "^5" } }, "paperwall-io-paperwall-lib-4f65487", "sha512-czQ9KHRLJLtv1IV7aHkAlPUAhuoZxeiw/kNTL05p6Q/6wzFr0rhLkLdRoDE1+7KD92HhYb3hKCO7alfcJAHbqw=="],
+    "paperwall": ["paperwall@github:paperwall-io/paperwall-lib#2774236", { "dependencies": { "varlock": "^1.2.0" }, "peerDependencies": { "typescript": "^5" } }, "paperwall-io-paperwall-lib-2774236", "sha512-qMukWyAADwxohYgetY0prjiZ4JknD5hPMcnDErsgwbyg0LdeTMFCnJjLN6i26CXDLRhxIxaoMkz5r8hlHf7qoQ=="],
 
     "path": ["path@0.12.7", "", { "dependencies": { "process": "^0.11.1", "util": "^0.10.3" } }, "sha512-aXXC6s+1w7otVF9UletFkFcDsJeO7lSZBPUQhtb5O0xJe8LtYhj/GxldoL09bBj9+ZmE2hNoHqQSFMN5fikh4Q=="],
 

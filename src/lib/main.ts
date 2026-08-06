@@ -14,9 +14,13 @@ export default initPaperwall(
   window.wallConfig || {
     mode: 'local',
     siteToken: "DbZJhUWu62P", // jweatherby.dev
+    // Only used when the page has no wallConfig — i.e. local development
+    // against ghost-blog. Kept in the same shape the portal now generates, so
+    // developing here exercises what a publisher actually installs.
     articleFinder: {
-      selector: "blog-post",
-      postUrls: [/posts\/\w+\/?/],
+      selector: ".gh-content",
+      postUrls: [/^\/[^\/]+\/?$/],
+      excludeUrls: [/^\/(about|contact|privacy)\/?$/, /^\/tag\//, /^\/author\//, /^\/ghost\//],
     },
   }
 );
