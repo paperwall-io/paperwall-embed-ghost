@@ -18,7 +18,10 @@ export interface ISettings {
   mode: "live" | "sandbox" | "local";
   portalUrl: string;
   uploads: {
+    /** Host the assets are served from, with no path. */
     assetDomain: string;
+    /** Environment-scoped path, shared by the S3 key and the public URL. */
+    keyPrefix: string;
     endpoint: string;
     bucket: string;
   };

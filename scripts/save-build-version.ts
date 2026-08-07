@@ -1,7 +1,7 @@
 import { type BunFile } from "bun";
 import { readdir } from "node:fs/promises";
 import crypto from "crypto";
-import { s3Upload } from "./tigris-upload";
+import { assetUrl, s3Upload } from "./tigris-upload";
 import settings from "../src/settings";
 
 type FetchOpts = {
@@ -84,9 +84,11 @@ const uploadBuildAssets = async ({
   if (!(jsUploaded && cssUploaded)) {
     throw new Error("Upload failed");
   }
+  // Built from the same helper that produced the storage key, so the URL we
+  // register can never address an object other than the one just uploaded.
   return {
-    jsUrl: settings.uploads.assetDomain + jsFile.filename,
-    cssUrl: settings.uploads.assetDomain + cssFile.filename,
+    jsUrl: assetUrl(jsFile.filename),
+    cssUrl: assetUrl(cssFile.filename),
   };
 };
 
