@@ -30,22 +30,29 @@ function getHash(type: string, content: string) {
   return crypto.createHash(type).update(content, "utf8").digest("base64");
 }
 
-const extractVersion = (filename: string) =>
-  filename.replace(/\S+(v\d+\.\d+)\.(js|css)/, "$1");
+/**
+ * The version is the trailing segment of the build's filename.
+ *
+ * Vite names the bundle `paperwall[-ghost]-${EMBED_VERSION || "dev"}`, so this
+ * reads back whatever that produced rather than insisting on a `v1.2` shape.
+ * Requiring the tag pattern meant a local build — named `-dev` — matched
+ * nothing in dist and failed with a missing-files error that pointed at the
+ * filename instead of at the absent EMBED_VERSION.
+ */
+const extractVersion = (filename: string): string =>
+  filename.replace(/\.(js|css)$/, "").split("-").pop() ?? "";
 
 const getBuildInfo = async () => {
   const distDir = import.meta.dirname + "/../dist/";
   const distFiles = await readdir(distDir);
 
-  const cssFileName = distFiles.find((filename) =>
-    filename.match(/v\d+\.\d+\.css$/)
-  );
-  const jsFileName = distFiles.find((filename) =>
-    filename.match(/v\d+\.\d+\.js$/)
-  );
+  const cssFileName = distFiles.find((filename) => filename.endsWith(".css"));
+  const jsFileName = distFiles.find((filename) => filename.endsWith(".js"));
   if (!(cssFileName && jsFileName)) {
     throw new Error(
-      "Files not found - make sure the filename matches [name]-v[version].[js|css]"
+      `No built js/css found in ${distDir} — run the build first. Found: ${
+        distFiles.join(", ") || "nothing"
+      }`
     );
   }
   const cssContents = Bun.file(distDir + cssFileName);
