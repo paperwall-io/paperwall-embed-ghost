@@ -2,7 +2,12 @@
   import { onMount } from "svelte";
   import pw from "@lib/main";
   import wallStore from "@lib/stores";
-  import type { Article, ArticleFlags, PlatformSettings } from "paperwall";
+  import type {
+    Article,
+    ArticleFlags,
+    ArticleSession,
+    PlatformSettings,
+  } from "paperwall";
   import { formatPrice } from "paperwall";
   import { attachAfterSubscribe, type GhostCtaAnchor } from "../ghostCta";
 
@@ -29,8 +34,11 @@
 
   let pwCta = $derived.by(() => pw.getCta() as string);
 
-  let { flags, article, currency, platform } = $derived($wallStore.entities) as {
+  let { flags, article, articleSession, currency, platform } = $derived(
+    $wallStore.entities,
+  ) as {
     article: Article;
+    articleSession: ArticleSession;
     flags: ArticleFlags;
     currency: string;
     platform: PlatformSettings;
@@ -38,7 +46,13 @@
 
   let currencyConfig = $derived(platform?.currencies?.[currency]);
   let mode = $derived(platform?.pricingMode ?? "tickets");
-  let requiresTickets = $derived(article.num_tickets > 0);
+  // The price this reader was quoted, which outlives a publisher's price change
+  // for a window. article.num_tickets is the current list price and would
+  // contradict the button's own behaviour.
+  let numTickets = $derived(
+    articleSession?.data?.pricing?.num_tickets ?? article.num_tickets,
+  );
+  let requiresTickets = $derived(numTickets > 0);
   let readingTime: null | number = $derived(pw.getReadingTime());
 
   // Moved rather than rendered in place: the app mounts into its own container
@@ -65,11 +79,7 @@
     />
     <span>
       {#if requiresTickets}
-        Read this article for {formatPrice(
-          article.num_tickets,
-          mode,
-          currencyConfig,
-        )}
+        Read this article for {formatPrice(numTickets, mode, currencyConfig)}
       {:else}
         Read this article for FREE
       {/if}
@@ -77,8 +87,8 @@
   </a>
 
   <p class="pw-explainer">
-    No subscription{#if readingTime}, {readingTime} min read{/if} — pay for this
-    article only, with
+    No subscription — read just this
+    article with
     <a class="pw-link" href="https://paperwall.io" target="_blank" rel="noreferrer">
       Paperwall</a
     >.

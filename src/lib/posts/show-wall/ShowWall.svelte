@@ -29,7 +29,13 @@
   let siteLogo: string = $derived(
     pw.config.theme?.siteLogo ?? (article.site.logo || ""),
   );
-  let requiresTickets: boolean = $derived(article.num_tickets > 0);
+  // The session's price, not the article's list price: a quote is honoured for
+  // a window after a publisher changes a price, so the two legitimately differ
+  // and only the session's is what this reader will be charged.
+  let numTickets: number = $derived(
+    articleSession?.data?.pricing?.num_tickets ?? article.num_tickets,
+  );
+  let requiresTickets: boolean = $derived(numTickets > 0);
   let readingTime: null | number = $derived(pw.getReadingTime());
 </script>
 
@@ -66,7 +72,7 @@
               alt="Paperwall"
             />
             {#if requiresTickets}
-              Read for {formatPrice(article.num_tickets, mode, currencyConfig)}
+              Read for {formatPrice(numTickets, mode, currencyConfig)}
             {:else}
               Read for FREE
             {/if}
