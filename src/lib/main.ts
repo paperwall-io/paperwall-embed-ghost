@@ -37,9 +37,24 @@ const wallConfig: WallConfig = window.wallConfig || {
 // Merged field by field in paperwall-lib, so a publisher overriding only the
 // selector for a custom theme keeps Ghost's URL rules instead of silently
 // losing them.
-export default initPaperwall(wallConfig, {
+const pw = initPaperwall(wallConfig, {
   articleFinder: GHOST_ARTICLE_FINDER,
 });
+
+/**
+ * Announce which build is running and which API it will talk to.
+ *
+ * `mode` is the single setting that decides whether a page is hitting
+ * production, sandbox or a laptop, and getting it wrong looks like everything
+ * else being broken — a wall that never unlocks, a site that will not verify.
+ * The effective value is logged rather than the configured one, because an
+ * omitted `mode` silently means live.
+ */
+console.log(
+  `[paperwall] ghost embed · mode: ${wallConfig.mode ?? "live (default)"} · api: ${pw.config.apiBaseUrl}`,
+);
+
+export default pw;
 
 // initialize app in the body element
 const $appEl = document.createElement("div");
