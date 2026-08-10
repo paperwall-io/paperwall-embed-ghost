@@ -87,9 +87,13 @@
   </a>
 
   <p class="pw-explainer">
-    No subscription — read just this
-    article with
-    <a class="pw-link" href="https://paperwall.io" target="_blank" rel="noreferrer">
+    No subscription needed, read just this article with
+    <a
+      class="pw-link"
+      href="https://paperwall.io"
+      target="_blank"
+      rel="noreferrer"
+    >
       Paperwall</a
     >.
   </p>
