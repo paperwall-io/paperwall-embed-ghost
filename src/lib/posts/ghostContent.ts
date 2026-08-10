@@ -315,7 +315,7 @@ export const showError = (message: string): void => {
       authorNode,
       " or ",
       support,
-      " if this persists",
+      " if this persists.",
     );
     el.title = message;
   });
