@@ -34,9 +34,11 @@ const wallConfig: WallConfig = window.wallConfig || {
   siteToken: "DbZJhUWu62P", // jweatherby.dev
 };
 
-export default initPaperwall({
-  ...wallConfig,
-  articleFinder: wallConfig.articleFinder ?? GHOST_ARTICLE_FINDER,
+// Merged field by field in paperwall-lib, so a publisher overriding only the
+// selector for a custom theme keeps Ghost's URL rules instead of silently
+// losing them.
+export default initPaperwall(wallConfig, {
+  articleFinder: GHOST_ARTICLE_FINDER,
 });
 
 // initialize app in the body element
