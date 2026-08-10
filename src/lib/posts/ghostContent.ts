@@ -10,6 +10,8 @@
  * paperwall-lib.
  */
 
+import { attachAfterSubscribe, findGhostCtaAnchor } from "./ghostCta";
+
 /** Where Ghost's Source theme renders {{content}} — see post.hbs. */
 const CONTENT_SELECTOR = ".gh-content";
 
@@ -146,22 +148,23 @@ const clearStatus = (): void => {
 };
 
 /**
- * Renders a small notice *inside* Ghost's paywall card rather than in place of
- * the article.
+ * Renders a status line in the slot Paperwall's own CTA occupied — directly
+ * after Ghost's subscribe button — reusing the same anchor the CTA uses so
+ * there is one rule for where Paperwall speaks inside a publisher's paywall.
  *
- * Inline styles rather than a stylesheet, and every dimension in `em` rather
- * than `rem`: Ghost's Source theme sets `html { font-size: 62.5% }`, so `1rem`
- * is 10px there and a "0.8125rem" notice renders at 8px. Sizing against the
- * inherited font instead lands at ~13px next to 17px body copy, on any theme.
+ * By the time this runs the CTA itself is gone: GhostCta removes its node on
+ * unmount, and the reader is past the offer. This takes its place rather than
+ * annotating the publisher's own copy.
  *
- * Colours derive from `currentColor` for the same reason — the card is pink
- * with white text here, but a fixed palette would disappear on a theme that
- * inverts that.
+ * Sizes are absolute px, matching `.pw-explainer` in GhostCta. Deliberately not
+ * `rem`: Ghost's Source theme sets `html { font-size: 62.5% }`, so `1rem` is
+ * 10px there and anything sized that way renders far too small.
  */
 const renderStatus = (build: (el: HTMLElement) => void): void => {
-  const host =
+  const anchor = findGhostCtaAnchor();
+  const fallback =
     document.querySelector<HTMLElement>(PAYWALL_BODY_SELECTOR) ?? getPaywallEl();
-  if (!host) return;
+  if (!anchor && !fallback) return;
 
   clearStatus();
 
@@ -172,57 +175,61 @@ const renderStatus = (build: (el: HTMLElement) => void): void => {
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    gap: "0.5em",
+    gap: "8px",
     flexWrap: "wrap",
-    margin: "1em auto 0",
-    maxWidth: "32em",
-    padding: "0.5em 0.75em",
-    borderRadius: "4px",
-    border: "1px solid",
-    borderColor: "currentColor",
-    background: "transparent",
+    width: "100%",
+    margin: "12px 0 0",
     color: "inherit",
-    font: "inherit",
-    fontSize: "0.8125em",
+    fontSize: "14px",
     lineHeight: "1.4",
-    opacity: "0.9",
+    opacity: "0.8",
+    textAlign: "center",
   } satisfies Partial<CSSStyleDeclaration>);
 
   build(el);
-  host.appendChild(el);
+
+  if (anchor) attachAfterSubscribe(anchor, el);
+  else fallback!.appendChild(el);
+};
+
+/** The Paperwall mark, so a message in the publisher's paywall reads as ours. */
+const paperwallIcon = (): HTMLImageElement => {
+  const icon = document.createElement("img");
+  icon.src = "https://assets.paperwall.io/logo-v3.1-icon.png";
+  icon.alt = "";
+  Object.assign(icon.style, {
+    height: "16px",
+    width: "16px",
+    objectFit: "contain",
+    flex: "0 0 auto",
+  } satisfies Partial<CSSStyleDeclaration>);
+  return icon;
 };
 
 /** Signals the unlock is in flight, leaving Ghost's paywall visible until it lands. */
 export const showLoading = (): void => {
   renderStatus((el) => {
-    el.textContent = "Unlocking this article…";
+    const text = document.createElement("span");
+    text.textContent = "Unlocking this article…";
+    el.append(paperwallIcon(), text);
   });
 };
 
-export const showError = (message: string, onRetry: () => void): void => {
+/**
+ * Reports a failed unlock.
+ *
+ * Leads with the fact that the purchase went through — a reader who has already
+ * paid and is looking at a subscribe button needs that first. The technical
+ * detail goes to the title attribute and the console; it means nothing to them
+ * and would only add noise to the publisher's paywall.
+ */
+export const showError = (message: string): void => {
   renderStatus((el) => {
     const text = document.createElement("span");
-    // The reader's real worry is whether they paid for nothing; the technical
-    // detail is for us and stays in the console.
-    text.textContent = "Couldn't load this article. Your purchase is safe.";
+    text.textContent =
+      "Unlocked with Paperwall, could not load article at this time. Contact us if this persists";
 
-    const retry = document.createElement("button");
-    retry.type = "button";
-    retry.textContent = "Try again";
-    Object.assign(retry.style, {
-      font: "inherit",
-      fontSize: "inherit",
-      padding: "0.15em 0.6em",
-      borderRadius: "3px",
-      border: "1px solid",
-      borderColor: "currentColor",
-      background: "transparent",
-      color: "inherit",
-      cursor: "pointer",
-    } satisfies Partial<CSSStyleDeclaration>);
-    retry.addEventListener("click", onRetry);
-
-    el.append(text, retry);
+    el.append(paperwallIcon(), text);
     el.title = message;
   });
 };

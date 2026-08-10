@@ -66,7 +66,7 @@
       const message = err instanceof Error ? err.message : "unknown error";
       console.error("[paperwall] article unlock failed", err);
       unlock = { status: "error", message };
-      showError(message, unlockArticle);
+      showError(message);
     }
   };
   $effect(() => {
@@ -105,7 +105,8 @@
 
   $effect(() => {
     // `idle` guard keeps this to one fetch per load — the effect re-runs on any
-    // entity change, and a retry is driven by the error button instead.
+    // entity change, and a failed unlock should not retry on its own. Recovery
+    // is a page reload, which Ghost serves gated again anyway.
     if (
       $wallStore.wallState === "@paperwall/show_article" &&
       unlock.status === "idle"
