@@ -16,7 +16,7 @@ await $`bun link`.cwd(libPath).quiet();
 await $`bun link paperwall`.quiet();
 
 try {
-  await $`varlock run -- vite --host embed.pw.local --port 5174`;
+  await $`vite --host embed.pw.local --port 5174`;
 } finally {
   // Restore the published dependency on exit
   await $`bun install --force`.quiet();

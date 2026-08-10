@@ -19,9 +19,9 @@
   },
   "private": true,
   "scripts": {
-    "dev": "APP_ENV=dev varlock run -- vite --host embed.pw.local --port 5174",
+    "dev": "vite --host embed.pw.local --port 5174",
     "dev:local": "bun ./scripts/dev-local.ts",
-    "build": "varlock run -- vite build",
+    "build": "vite build",
     "postbuild": "varlock run -- bun ./scripts/save-build-version.ts",
     "preview": "vite preview",
     "check": "svelte-check --tsconfig ./tsconfig.json"

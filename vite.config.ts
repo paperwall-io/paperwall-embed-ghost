@@ -25,7 +25,6 @@ export default defineConfig({
   resolve: {
     alias: {
       '@lib': resolve('./src/lib'),
-      '@settings': resolve('./src/settings'),
     }
   },
   build: {

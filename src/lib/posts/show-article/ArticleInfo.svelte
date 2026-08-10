@@ -1,5 +1,4 @@
 <script lang="ts">
-  import settings from "@settings";
   import pw from "@lib/main";
   import wallStore from "@lib/stores";
   import RateArticle from "./components/RateArticle.svelte";
