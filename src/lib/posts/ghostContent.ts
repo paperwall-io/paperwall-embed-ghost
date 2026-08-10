@@ -30,6 +30,9 @@ const PAYWALL_BODY_SELECTOR = ".gh-post-upgrade-cta-content";
 
 const STATUS_ID = "paperwall-unlock-status";
 
+/** Where a reader reaches us when the publisher is not the problem. */
+const SUPPORT_URL = "https://paperwall.io/contact";
+
 export type UnlockState =
   | { readonly status: "idle" }
   | { readonly status: "loading" }
@@ -171,17 +174,16 @@ const renderStatus = (build: (el: HTMLElement) => void): void => {
   const el = document.createElement("div");
   el.id = STATUS_ID;
   el.setAttribute("aria-live", "polite");
+  // A text block rather than a flex row: the message wraps to two lines at this
+  // width, and as a flex item the icon was pushed onto a line of its own above
+  // the text. Inline, it stays with the first word.
   Object.assign(el.style, {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: "8px",
-    flexWrap: "wrap",
     width: "100%",
-    margin: "12px 0 0",
+    maxWidth: "34em",
+    margin: "12px auto 0",
     color: "inherit",
     fontSize: "14px",
-    lineHeight: "1.4",
+    lineHeight: "1.5",
     opacity: "0.8",
     textAlign: "center",
   } satisfies Partial<CSSStyleDeclaration>);
@@ -201,7 +203,10 @@ const paperwallIcon = (): HTMLImageElement => {
     height: "16px",
     width: "16px",
     objectFit: "contain",
-    flex: "0 0 auto",
+    display: "inline-block",
+    // Optically centred against 14px text; `middle` sits it too high.
+    verticalAlign: "-3px",
+    marginRight: "6px",
   } satisfies Partial<CSSStyleDeclaration>);
   return icon;
 };
@@ -209,9 +214,7 @@ const paperwallIcon = (): HTMLImageElement => {
 /** Signals the unlock is in flight, leaving Ghost's paywall visible until it lands. */
 export const showLoading = (): void => {
   renderStatus((el) => {
-    const text = document.createElement("span");
-    text.textContent = "Unlocking this article…";
-    el.append(paperwallIcon(), text);
+    el.append(paperwallIcon(), "Unlocking this article…");
   });
 };
 
@@ -225,11 +228,31 @@ export const showLoading = (): void => {
  */
 export const showError = (message: string): void => {
   renderStatus((el) => {
-    const text = document.createElement("span");
-    text.textContent =
-      "Unlocked with Paperwall, could not load article at this time. Contact us if this persists";
+    // Two routes on purpose. The publisher owns the content and may simply have
+    // unpublished it; we own the delivery. A reader offered only one of us gets
+    // bounced when they pick wrong.
+    //
+    // The author is named rather than linked: the reader is already on the
+    // publisher's site and knows how to reach them, whereas inventing a contact
+    // URL for an arbitrary Ghost install would send some of them to a 404.
+    const support = document.createElement("a");
+    support.href = SUPPORT_URL;
+    support.target = "_blank";
+    support.rel = "noreferrer";
+    support.textContent = "Paperwall support";
+    // Ghost already underlines anchors in this block; inheriting the colour is
+    // what keeps the link legible on the publisher's accent background.
+    Object.assign(support.style, {
+      color: "inherit",
+      textDecoration: "underline",
+    } satisfies Partial<CSSStyleDeclaration>);
 
-    el.append(paperwallIcon(), text);
+    el.append(
+      paperwallIcon(),
+      "Unlocked with Paperwall, could not load article at this time. Contact the author or ",
+      support,
+      " if this persists",
+    );
     el.title = message;
   });
 };
