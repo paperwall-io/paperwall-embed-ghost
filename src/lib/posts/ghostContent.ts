@@ -5,13 +5,28 @@
  * page whose body is nothing but an upgrade CTA. This module fetches the real
  * body from the API (which reads it from Ghost's Admin API) and swaps it in.
  *
- * POC scope: the `.gh-content` target is hardcoded for Ghost's Source theme
- * rather than being configurable. Generalising this means adding a content
- * selector to WallConfig in paperwall-lib.
+ * POC scope: the selectors are hardcoded for Ghost's Source theme rather than
+ * being configurable. Generalising this means adding them to WallConfig in
+ * paperwall-lib.
  */
 
 /** Where Ghost's Source theme renders {{content}} — see post.hbs. */
 const CONTENT_SELECTOR = ".gh-content";
+
+/**
+ * Ghost's own members-only paywall, rendered in place of the body of a gated
+ * post. Its presence is what tells us there is something to unlock.
+ */
+const PAYWALL_SELECTOR = ".gh-post-upgrade-cta";
+
+/**
+ * The visible card inside the paywall. The `aside` above is transparent and
+ * full-bleed; this inner element carries the background, so a notice appended
+ * to the outer one renders outside the card entirely.
+ */
+const PAYWALL_BODY_SELECTOR = ".gh-post-upgrade-cta-content";
+
+const STATUS_ID = "paperwall-unlock-status";
 
 export type UnlockState =
   | { readonly status: "idle" }
@@ -21,6 +36,19 @@ export type UnlockState =
 
 const getContentEl = (): HTMLElement | null =>
   document.querySelector(CONTENT_SELECTOR);
+
+const getPaywallEl = (): HTMLElement | null =>
+  document.querySelector(PAYWALL_SELECTOR);
+
+/**
+ * Whether this page actually has a Ghost members paywall to replace.
+ *
+ * Guards the whole unlock. Without it we would blow away `.gh-content` on any
+ * page a redeemed reader visits — including posts that were never gated, where
+ * the body already on the page is the real article and replacing it can only
+ * make things worse.
+ */
+export const hasMembersPaywall = (): boolean => !!getPaywallEl();
 
 export const fetchArticleContent = async (opts: {
   readonly apiBaseUrl: string;
@@ -113,34 +141,90 @@ const rehydrateCards = (): void => {
   }
 };
 
-/** Swaps the upgrade CTA for a placeholder the moment we know we'll unlock. */
+const clearStatus = (): void => {
+  document.getElementById(STATUS_ID)?.remove();
+};
+
+/**
+ * Renders a small notice *inside* Ghost's paywall card rather than in place of
+ * the article.
+ *
+ * Inline styles rather than a stylesheet, and every dimension in `em` rather
+ * than `rem`: Ghost's Source theme sets `html { font-size: 62.5% }`, so `1rem`
+ * is 10px there and a "0.8125rem" notice renders at 8px. Sizing against the
+ * inherited font instead lands at ~13px next to 17px body copy, on any theme.
+ *
+ * Colours derive from `currentColor` for the same reason — the card is pink
+ * with white text here, but a fixed palette would disappear on a theme that
+ * inverts that.
+ */
+const renderStatus = (build: (el: HTMLElement) => void): void => {
+  const host =
+    document.querySelector<HTMLElement>(PAYWALL_BODY_SELECTOR) ?? getPaywallEl();
+  if (!host) return;
+
+  clearStatus();
+
+  const el = document.createElement("div");
+  el.id = STATUS_ID;
+  el.setAttribute("aria-live", "polite");
+  Object.assign(el.style, {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: "0.5em",
+    flexWrap: "wrap",
+    margin: "1em auto 0",
+    maxWidth: "32em",
+    padding: "0.5em 0.75em",
+    borderRadius: "4px",
+    border: "1px solid",
+    borderColor: "currentColor",
+    background: "transparent",
+    color: "inherit",
+    font: "inherit",
+    fontSize: "0.8125em",
+    lineHeight: "1.4",
+    opacity: "0.9",
+  } satisfies Partial<CSSStyleDeclaration>);
+
+  build(el);
+  host.appendChild(el);
+};
+
+/** Signals the unlock is in flight, leaving Ghost's paywall visible until it lands. */
 export const showLoading = (): void => {
-  const el = getContentEl();
-  if (!el) return;
-  el.innerHTML =
-    '<p class="paperwall-unlock-status" aria-live="polite">Unlocking this article…</p>';
+  renderStatus((el) => {
+    el.textContent = "Unlocking this article…";
+  });
 };
 
 export const showError = (message: string, onRetry: () => void): void => {
-  const el = getContentEl();
-  if (!el) return;
+  renderStatus((el) => {
+    const text = document.createElement("span");
+    // The reader's real worry is whether they paid for nothing; the technical
+    // detail is for us and stays in the console.
+    text.textContent = "Couldn't load this article. Your purchase is safe.";
 
-  el.innerHTML = "";
+    const retry = document.createElement("button");
+    retry.type = "button";
+    retry.textContent = "Try again";
+    Object.assign(retry.style, {
+      font: "inherit",
+      fontSize: "inherit",
+      padding: "0.15em 0.6em",
+      borderRadius: "3px",
+      border: "1px solid",
+      borderColor: "currentColor",
+      background: "transparent",
+      color: "inherit",
+      cursor: "pointer",
+    } satisfies Partial<CSSStyleDeclaration>);
+    retry.addEventListener("click", onRetry);
 
-  const wrapper = document.createElement("p");
-  wrapper.className = "paperwall-unlock-status";
-  wrapper.setAttribute("aria-live", "polite");
-  // Say plainly that they still own it — otherwise a failure is indistinguishable
-  // from a paywall they just paid to remove.
-  wrapper.textContent = `We couldn't load this article (${message}). Your purchase is safe — you have not been charged again. `;
-
-  const retry = document.createElement("button");
-  retry.type = "button";
-  retry.textContent = "Try again";
-  retry.addEventListener("click", onRetry);
-
-  wrapper.appendChild(retry);
-  el.appendChild(wrapper);
+    el.append(text, retry);
+    el.title = message;
+  });
 };
 
 export const injectContent = (html: string): boolean => {
@@ -150,6 +234,7 @@ export const injectContent = (html: string): boolean => {
     return false;
   }
 
+  clearStatus();
   el.innerHTML = html;
   rehydrateScripts(el);
   rehydrateCards();

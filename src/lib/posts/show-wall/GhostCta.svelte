@@ -91,8 +91,8 @@
     <a
       class="pw-link"
       href="https://paperwall.io"
-      target="_blank"
       rel="noreferrer"
+      target="_blank"
     >
       Paperwall</a
     >.

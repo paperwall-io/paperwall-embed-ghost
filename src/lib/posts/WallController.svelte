@@ -7,6 +7,7 @@
   import { findGhostCtaAnchor } from "./ghostCta";
   import {
     fetchArticleContent,
+    hasMembersPaywall,
     injectContent,
     showError,
     showLoading,
@@ -40,6 +41,14 @@
   const unlockArticle = async () => {
     const { article, articleSession, siteSession } = $wallStore.entities;
     if (!article || !articleSession || !siteSession) return;
+
+    // Nothing to unlock: Ghost served the real body, so replacing `.gh-content`
+    // could only destroy it. Happens on public posts and on any post the reader
+    // can already read, where being redeemed says nothing about the page.
+    if (!hasMembersPaywall()) {
+      unlock = { status: "done" };
+      return;
+    }
 
     unlock = { status: "loading" };
     showLoading();
