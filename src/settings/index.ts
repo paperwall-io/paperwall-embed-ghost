@@ -11,7 +11,6 @@ if (import.meta.env.APP_ENV === "production") {
   settings = devSettings;
 }
 
-console.log("loaded env", import.meta.env.APP_ENV);
 
 export interface ISettings {
   env: "dev" | "staging" | "production";
