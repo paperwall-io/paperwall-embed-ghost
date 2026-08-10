@@ -79,7 +79,9 @@ export const fetchArticleContent = async (opts: {
   const body = await res.json().catch(() => null);
 
   if (!res.ok) {
-    throw new Error(body?.errors?.[0]?.message ?? `Request failed (${res.status})`);
+    throw new Error(
+      body?.errors?.[0]?.message ?? `Request failed (${res.status})`,
+    );
   }
   if (typeof body?.html !== "string") {
     throw new Error("No article content returned");
@@ -115,7 +117,10 @@ const rehydrateScripts = (container: HTMLElement): void => {
       replacement.text = old.textContent ?? "";
       old.parentNode?.replaceChild(replacement, old);
     } catch (err) {
-      console.warn("[paperwall] could not rehydrate a script in article content", err);
+      console.warn(
+        "[paperwall] could not rehydrate a script in article content",
+        err,
+      );
     }
   }
 };
@@ -166,7 +171,8 @@ const clearStatus = (): void => {
 const renderStatus = (build: (el: HTMLElement) => void): void => {
   const anchor = findGhostCtaAnchor();
   const fallback =
-    document.querySelector<HTMLElement>(PAYWALL_BODY_SELECTOR) ?? getPaywallEl();
+    document.querySelector<HTMLElement>(PAYWALL_BODY_SELECTOR) ??
+    getPaywallEl();
   if (!anchor && !fallback) return;
 
   clearStatus();
@@ -192,6 +198,46 @@ const renderStatus = (build: (el: HTMLElement) => void): void => {
 
   if (anchor) attachAfterSubscribe(anchor, el);
   else fallback!.appendChild(el);
+};
+
+/** Ghost's own author link in the post header, rendered by every stock theme. */
+const AUTHOR_LINK_SELECTOR = ".gh-article-author-name a";
+
+interface PostAuthor {
+  readonly name: string;
+  /** Ghost's standard `/author/:slug/` page. */
+  readonly url: string;
+}
+
+/**
+ * Reads the post's author off the page.
+ *
+ * Taken from the DOM rather than the API because the API knows the *site*, not
+ * which byline this particular post carries. Ghost renders the author's name
+ * and `/author/:slug/` link in the header of every stock theme, and repeats
+ * both in its ld+json — so the second is a real fallback, not a guess.
+ *
+ * The first link wins when a post has several authors: Ghost orders them with
+ * the primary author first, and naming all of them would bloat a one-line
+ * status.
+ */
+const findPostAuthor = (): PostAuthor | null => {
+  const link = document.querySelector<HTMLAnchorElement>(AUTHOR_LINK_SELECTOR);
+  const name = link?.textContent?.trim();
+  if (link && name) return { name, url: link.href };
+
+  try {
+    const ld = document.querySelector('script[type="application/ld+json"]');
+    const parsed = JSON.parse(ld?.textContent ?? "");
+    const author = Array.isArray(parsed?.author) ? parsed.author[0] : parsed?.author;
+    if (typeof author?.name === "string" && typeof author?.url === "string") {
+      return { name: author.name, url: author.url };
+    }
+  } catch {
+    // Malformed or absent ld+json just means we fall through to plain text.
+  }
+
+  return null;
 };
 
 /** The Paperwall mark, so a message in the publisher's paywall reads as ours. */
@@ -231,15 +277,12 @@ export const showError = (message: string): void => {
     // Two routes on purpose. The publisher owns the content and may simply have
     // unpublished it; we own the delivery. A reader offered only one of us gets
     // bounced when they pick wrong.
-    //
-    // The author is named rather than linked: the reader is already on the
-    // publisher's site and knows how to reach them, whereas inventing a contact
-    // URL for an arbitrary Ghost install would send some of them to a 404.
     const support = document.createElement("a");
     support.href = SUPPORT_URL;
     support.target = "_blank";
     support.rel = "noreferrer";
     support.textContent = "Paperwall support";
+    const breakline = document.createElement("br");
     // Ghost already underlines anchors in this block; inheriting the colour is
     // what keeps the link legible on the publisher's accent background.
     Object.assign(support.style, {
@@ -247,9 +290,30 @@ export const showError = (message: string): void => {
       textDecoration: "underline",
     } satisfies Partial<CSSStyleDeclaration>);
 
+    // Named and linked when the page tells us who wrote it; "the author"
+    // otherwise, rather than a link we invented.
+    const author = findPostAuthor();
+    let authorNode: Node = document.createTextNode("the author");
+    if (author) {
+      const link = document.createElement("a");
+      // No target: the author's page is on the site the reader is already on,
+      // so opening a new tab would be gratuitous.
+      link.href = author.url;
+      link.textContent = author.name;
+      Object.assign(link.style, {
+        color: "inherit",
+        textDecoration: "underline",
+      } satisfies Partial<CSSStyleDeclaration>);
+      authorNode = link;
+    }
+
     el.append(
       paperwallIcon(),
-      "Unlocked with Paperwall, could not load article at this time. Contact the author or ",
+      "Unlocked with Paperwall, could not load article at this time.",
+      breakline,
+      "Contact ",
+      authorNode,
+      " or ",
       support,
       " if this persists",
     );
